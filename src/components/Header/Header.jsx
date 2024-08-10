@@ -7,6 +7,10 @@ function Header() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const token = useSelector((state) => state.user.token);
+  const state = useSelector((state) => state);
+  
+  const user = useSelector((state) => state?.user?.userProfile?.body?.firstName);
+  console.log(state);
 
   const handleSignOut = () => {
     dispatch(setToken(null));
@@ -22,10 +26,16 @@ function Header() {
       </a>
       <div>
         {token ? (
-          <a className="main-nav-item" onClick={handleSignOut}>
-            <i className="fa fa-sign-out"></i>
-            Sign Out
-          </a>
+          <div className="main-nav-items">
+            <a href="/profile" className="main-nav-item">
+              <i className="fa fa-user-circle"></i>
+              {user}
+            </a>
+            <div className="main-nav-item" onClick={handleSignOut}>
+              <i className="fa fa-sign-out"></i>
+              Sign Out
+            </div>
+          </div>
         ) : (
           <a className="main-nav-item" href="/login">
             <i className="fa fa-user-circle"></i>

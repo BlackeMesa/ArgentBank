@@ -1,0 +1,102 @@
+swagger: "2.0"
+info:
+  description: "API pour gérer les transactions financières d'un utilisateur."
+  version: "1.0.0"
+  title: "Gestionnaire de Transactions"
+
+host: "api.transactions.com"
+basePath: "/v1"
+schemes:
+  - "https"
+  - "http"
+
+paths:
+  /transactions:
+    get:
+      summary: "Voir toutes ses transactions pour le mois en cours"
+      description: "Récupère une liste des transactions de l'utilisateur pour le mois en cours."
+      responses:
+        200:
+          description: "Une liste de transactions a été récupérée avec succès."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Transaction"
+        404:
+          description: "Aucune transaction trouvée pour l'utilisateur dans le mois en cours."
+
+  /transactions/{transactionId}:
+    get:
+      summary: "Voir les détails supplémentaires d'une transaction"
+      description: "Récupère les détails d'une transaction spécifique par son ID."
+      parameters:
+        - name: "transactionId"
+          in: "path"
+          required: true
+          type: "string"
+          description: "ID unique de la transaction à retrouver."
+      responses:
+        200:
+          description: "Détails de la transaction récupérés avec succès."
+          schema:
+            $ref: "#/definitions/Transaction"
+        404:
+          description: "Transaction non trouvée."
+
+    put:
+      summary: "Modifier les informations d'une transaction"
+      description: "Met à jour les informations sur une transaction existante."
+      parameters:
+        - name: "transactionId"
+          in: "path"
+          required: true
+          type: "string"
+          description: "ID de la transaction à mettre à jour."
+        - in: "body"
+          name: "transaction"
+          description: "Données de transaction mises à jour."
+          required: true
+          schema:
+            $ref: "#/definitions/Transaction"
+      responses:
+        200:
+          description: "Transaction mise à jour avec succès."
+        404:
+          description: "Transaction non trouvée."
+
+    delete:
+      summary: "Supprimer une transaction"
+      description: "Supprime une transaction spécifique."
+      parameters:
+        - name: "transactionId"
+          in: "path"
+          required: true
+          type: "string"
+          description: "ID de la transaction à supprimer."
+      responses:
+        204:
+          description: "Transaction supprimée avec succès."
+        404:
+          description: "Transaction non trouvée."
+
+definitions:
+  Transaction:
+    type: "object"
+    required:
+      - "id"
+      - "amount"
+      - "date"
+    properties:
+      id:
+        type: "string"
+        description: "ID unique de la transaction."
+      amount:
+        type: "number"
+        description: "Montant de la transaction."
+      date:
+        type: "string"
+        format: "date-time"
+        description: "Date et heure de la transaction."
+      details:
+        type: "string"
+        description: "Détails supplémentaires sur la transaction."

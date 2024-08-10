@@ -8,29 +8,27 @@ function ProfilePage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const token = useSelector((state) => state.user.token);
-  const [userProfile, setUserProfileState] = useState(null);
-  const [isEditing, setIsEditing] = useState(false); // Pour afficher le formulaire d'édition
+
+  const [isEditing, setIsEditing] = useState(false);
 
   // Utilisez useSelector pour récupérer le token du store Redux
 
   useEffect(() => {
-    if (!token) {
-      navigate("/login"); // Rediriger si aucun token n'est trouvé
-      return;
-    }
+    const handleAsync = async () => {
+      if (!token) {
+        navigate("/login");
+        return;
+      }
 
-    fetchUserProfile(token)
-      .then((profile) => {
-        dispatch(setUserProfile(profile));
-
-        setUserProfileState(profile);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+      const data = await fetchUserProfile(token);
+      dispatch(setUserProfile(data));
+      console.log(data.body);
+    };
+    handleAsync();
   }, [navigate, token, dispatch]);
 
   const user = useSelector((state) => state.user?.userProfile?.body);
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
 
@@ -41,8 +39,8 @@ function ProfilePage() {
     event.preventDefault();
     try {
       const updatedProfile = await updateProfile(token, { firstName: firstName, lastName: lastName });
-      dispatch(setUserProfile(updatedProfile)); // Mettre à jour l'état global avec le profil mis à jour
-      setIsEditing(false); // Cacher le formulaire d'édition
+      dispatch(setUserProfile(updatedProfile));
+      setIsEditing(false);
     } catch (error) {
       console.error("Failed to update profile", error);
     }
@@ -52,15 +50,14 @@ function ProfilePage() {
   };
   const handleNameChange = (e) => {
     const { value, name } = e.target;
-    const regex = /^[A-Za-z]+$/; // Regex pour valider les lettres uniquement
+    const regex = /^[A-Za-z]+$/;
 
-    // Permet la suppression si le champ est vide (pour gérer les backspaces)
     if (value === "" || regex.test(value)) {
       name === "firstName" ? setFirstName(value) : setLastName(value);
     }
   };
 
-  if (!userProfile || !user) return <div>Loading profile...</div>;
+  if (!user) return <div>Loading profile...</div>;
 
   return (
     <main className="main bg-dark">
